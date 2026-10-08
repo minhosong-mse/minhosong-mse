@@ -1,0 +1,71 @@
+name: Sync portfolio README to profile
+
+on:
+  workflow_dispatch:
+  schedule:
+    # GitHub Actions cron times are UTC. Check once per hour, at minute 17.
+    - cron: "17 * * * *"
+  push:
+    paths:
+      - ".github/workflows/sync-profile-readme.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-readme-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out profile repository
+        uses: actions/checkout@v4
+
+      - name: Download portfolio README and fix relative links
+        shell: bash
+        run: |
+          curl --fail --location --silent --show-error --retry 3 \
+            --connect-timeout 15 --max-time 60 \
+            "https://raw.githubusercontent.com/minhosong-mse/minhosong-mse.github.io/main/README.md" \
+            --output /tmp/portfolio-readme.md
+
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          text = Path("/tmp/portfolio-readme.md").read_text(encoding="utf-8")
+          base = "https://github.com/minhosong-mse/minhosong-mse.github.io/blob/main/"
+          pattern = re.compile(r"(!?\[[^\]\n]*\]\()([^\s)]+)(\))")
+
+          def fix_link(match):
+              target = match.group(2)
+              if target.startswith(("https://", "http://", "mailto:", "#", "/", "data:")):
+                  return match.group(0)
+              target = target.removeprefix("./")
+              return match.group(1) + base + target + match.group(3)
+
+          text = pattern.sub(fix_link, text)
+          header = (
+              "<!-- This file is automatically synchronized from "
+              "minhosong-mse/minhosong-mse.github.io/README.md. "
+              "Edit the source README instead. -->\n\n"
+          )
+          Path("README.md").write_text(header + text, encoding="utf-8")
+          PY
+
+      - name: Commit changes if needed
+        shell: bash
+        run: |
+          if git diff --quiet -- README.md; then
+            echo "README.md already matches the source."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "chore: sync profile README from portfolio"
+          git push
