@@ -1,3 +1,5 @@
+<!-- This file is automatically synchronized from minhosong-mse/minhosong-mse.github.io/README.md. Edit the source README instead. -->
+
 # Minho Song | 송민호
 
 **Materials Science & Engineering · Semiconductor Device Research**
@@ -58,6 +60,7 @@ Sentaurus TCAD 연구의 코드 생성, 원격 실행, 결과 회수 과정을 �
 - [SE–X-ray Hybrid Metrology · High-k 박막 계측 연구](https://github.com/minhosong-mse/2026-SE-Xray-Hybrid-Metrology)
 - [Semiconductor Process Optimization · NMOS/PMOS 공정 최적화](https://github.com/minhosong-mse/Semiconductor_Process_mid)
 - [SSU Datathon · 연구 논문 데이터 분석](https://github.com/minhosong-mse/Datathon)
+- [AX AI Tutor · 논리표에서 반도체 Layout까지 연결하는 AI 학습 콘텐츠](https://github.com/minhosong-mse/AX)
 - **Capstone Design** · 제올라이트 기반 필터 교체 알림 공기청정기 (비공개 프로젝트)
 
 </details>
